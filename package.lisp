@@ -3,5 +3,6 @@
 (defpackage #:volt
   (:use #:cl)
   (:export
-   :sethash
-   :transpose))
+   sethash
+   transpose
+   put-if-absent))
