@@ -1,9 +1,3 @@
-# volt
-### _Your Name <your.name@example.com>_
+# Volt
 
-This is a project to do ... something.
-
-## License
-
-Specify license here
-
+A set of common lisp utility functions that I can't find elsewhere.
