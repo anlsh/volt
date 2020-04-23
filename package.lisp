@@ -1,7 +1,7 @@
 ;;;; package.lisp
 
 (defpackage #:volt
-  (:use #:cl)
+  (:use #:cl #:alexandria)
   (:export
    sethash
    transpose
