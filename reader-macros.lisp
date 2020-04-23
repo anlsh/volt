@@ -1,7 +1,8 @@
 ;; Macro for inline hash tables
 (in-package :volt)
 
-;; Following code lifted from https://news.ycombinator.com/item?id=1611090
+;; Following code modified from https://news.ycombinator.com/item?id=1611090
+;; It has serious bugs, yes I know :P
 (defun hash-table-from-pairs (pairs)
   (let ((table (make-hash-table :test #'equalp)))
     (mapcar (lambda (pair) (sethash ((eval (first pair)) (eval (second pair))) table))
