@@ -9,15 +9,19 @@
        (sethash (,key ,val) ,table))))
 
 
-(defmacro pythonic-import (imports &rest body)
+(defmacro imp (imports &rest body)
   ;; Imports has form
   ;;     (package-name (symbol-to-import | symbol-to-import nickname)*)*
+  ;;
+  ;; Wilcard imports are bad and I'm not going to support them.
+  ;; TODO Local package nicknames though, would be *incredibly* nice
 
-  ;; First we validate that "imports" matches our grammar
   (labels ((validate-pkgimport (pkg-import)
-             (or (symbolp (car pkg-import))
-                 (error (format nil "The car of ~a must be a symbol giving a package name"
-                                pkg-import)))
+             (unless (listp pkg-import) (error "Each pkg-import spec must be a list"))
+             (unless (listp (cdr pkg-import)) (error "The cdr must also be a list"))
+             (unless (symbolp (car pkg-import))
+               (error (format nil "The car of ~a must be a symbol giving a package name"
+                              pkg-import)))
              (mapcar #'validate-symspecs (cdr pkg-import)))
            (validate-symspecs (symspec)
              (or (symbolp symspec)
@@ -26,7 +30,7 @@
                  (error (format nil "Malformed symbol spec ~a" symspec)))))
     (mapcar #'validate-pkgimport imports))
 
-  ;; Now loop over the symbols of
+  ;; TODO This logic does not let you import the "*" symbol nicely
   (let ((replacement-map (fset:empty-map)))
     (arrow-macros:-<> imports
       (mapcar (lambda (pkg-spec)
