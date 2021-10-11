@@ -12,6 +12,21 @@
 (defmacro pythonic-import (imports &rest body)
   ;; Imports has form
   ;;     (package-name (symbol-to-import | symbol-to-import nickname)*)*
+
+  ;; First we validate that "imports" matches our grammar
+  (labels ((validate-pkgimport (pkg-import)
+             (or (symbolp (car pkg-import))
+                 (error (format nil "The car of ~a must be a symbol giving a package name"
+                                pkg-import)))
+             (mapcar #'validate-symspecs (cdr pkg-import)))
+           (validate-symspecs (symspec)
+             (or (symbolp symspec)
+                 (and (listp symspec) (equalp (length symspec) 2)
+                      (symbolp (car symspec)) (symbolp (cadr symspec)))
+                 (error (format nil "Malformed symbol spec ~a" symspec)))))
+    (mapcar #'validate-pkgimport imports))
+
+  ;; Now loop over the symbols of
   (let ((replacement-map (fset:empty-map)))
     (arrow-macros:-<> imports
       (mapcar (lambda (pkg-spec)
@@ -21,8 +36,8 @@
                                 (list sym-spec
                                       (find-symbol (symbol-name sym-spec)
                                                    pkg-name))
-                                (list (car sym-spec)
-                                      (find-symbol (symbol-name (cadr sym-spec))
+                                (list (cadr sym-spec)
+                                      (find-symbol (symbol-name (car sym-spec))
                                                    pkg-name))))
                           (cdr pkg-spec))))
               arrow-macros:<>)
